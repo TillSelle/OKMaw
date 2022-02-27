@@ -231,21 +231,21 @@ namespace Ok_Maw.Modules.Spells
         internal float CalculateActualQDamage(GameObjectBase target)
         {
             float RawAPDamage = QBaseDamagePerLevel[QLevel] + (ChampionClient.UnitStats.TotalAbilityPower * (QAPScalingPerLevel[QLevel] / 100));
-            Logger.Log($"Q Damage - {target.ModelName}:" + DamageCalculator.CalculateActualDamage(ChampionClient, target, 0, RawAPDamage, 0));
+            Logger.Log($"Q Damage - {target.ModelName}:" + DamageCalculator.CalculateActualDamage(ChampionClient, target, 0, RawAPDamage, 0) + $" Raw Damage: {RawAPDamage}");
             return DamageCalculator.CalculateActualDamage(ChampionClient, target, 0, RawAPDamage, 0);
         }
 
         internal float CalculateActualWDamagePerAA(GameObjectBase target)
         {
             float RawAPDamage = (target.MaxHealth * ((WMaxHealthPerLevel[WLevel] + ((float)decimal.Round((decimal)(ChampionClient.UnitStats.TotalAbilityPower / 100), 0))) / 100));
-            Logger.Log("W/AA Damage:" + DamageCalculator.CalculateActualDamage(ChampionClient, target, 0, RawAPDamage, 0));
+            Logger.Log("W/AA Damage:" + DamageCalculator.CalculateActualDamage(ChampionClient, target, 0, RawAPDamage, 0) + $" Raw Damage: {RawAPDamage}");
             return DamageCalculator.CalculateActualDamage(ChampionClient, target, 0, RawAPDamage, 0);
         }
 
         internal float CalculateActualEDamage(GameObjectBase target)
         {
             float RawAPDamage = EBaseDamagePerLevel[ELevel] + (ChampionClient.UnitStats.TotalAbilityPower * (EAPScalingPerLevel[ELevel] / 100));
-            Logger.Log("E Damage:" + DamageCalculator.CalculateActualDamage(ChampionClient, target, 0, RawAPDamage, 0));
+            Logger.Log("E Damage:" + DamageCalculator.CalculateActualDamage(ChampionClient, target, 0, RawAPDamage, 0) + $" Raw Damage: {RawAPDamage}");
             return DamageCalculator.CalculateActualDamage(ChampionClient, target, 0, RawAPDamage, 0);
         }
 
@@ -260,7 +260,7 @@ namespace Ok_Maw.Modules.Spells
             else {
                 RawPlusMissHealth = RawAPDamage + (MissingHealthInPercent * 0.83333333333333333333333333333F);
             }
-            Logger.Log("R Damage:" + DamageCalculator.CalculateActualDamage(ChampionClient, target, 0, RawPlusMissHealth, 0));
+            Logger.Log("R Damage:" + DamageCalculator.CalculateActualDamage(ChampionClient, target, 0, RawPlusMissHealth, 0) + $" Raw Damage: {RawAPDamage} : MissHealth {RawPlusMissHealth}");
             return DamageCalculator.CalculateActualDamage(ChampionClient, target, 0, RawPlusMissHealth, 0);
         }
     }
