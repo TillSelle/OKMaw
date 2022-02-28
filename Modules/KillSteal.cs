@@ -20,25 +20,17 @@ namespace Ok_Maw.Modules
 {
     internal static class KillSteal
     {
+        public static int Tick = 0;
+        public static int LastAATick = 0;
 
+        public static int BasicKogMawTab;
         public static int KillStealer;
         public static int KillStealerQ;
         public static int KillStealerE;
         public static int KillStealerR;
         public static int KillStealerAA;
-        public static int KillStealOn;
-        public static int AutoCaster;
-        public static int AutoCasterQ;
-        public static int AutoCasterQMode;
-        public static int AutoCasterQPred;
-        public static int AutoCasterW;
-        public static int AutoCasterWMode;
-        public static int AutoCasterE;
-        public static int AutoCasterEMode;
-        public static int AutoCasterEPred;
-        public static int AutoCasterR;
-        public static int AutoCasterRMode;
-        public static int AutoCasterRPred;
+        public static int KillStealMode;
+        
 
         public static bool IsKillable(this AIHeroClient target, SpellSlot spellslot)
         {
@@ -51,8 +43,9 @@ namespace Ok_Maw.Modules
             return kogMaw.CalculateActualDamage(target, spellslot) >= TotalHealth;
         }
 
-        public static Task KillstealerAndAutoCast()
+        public static Task Killstealer()
         {
+            Tick += 10;
             if (MenuManager.GetTab("OKMaw - Settings").GetItem<Switch>(KillStealer).IsOn)
             {
                 foreach (CanKillClass enemie in _CoreEvents.IsKillable)
@@ -66,22 +59,28 @@ namespace Ok_Maw.Modules
                         {
                             Orbwalker.AllowAttacking = false;
 
-                            var pred = Prediction.MenuSelected.GetPrediction(Prediction.MenuSelected.PredictionType.Circle, enemie.Target, RRange[UnitManager.MyChampion.GetSpellBook().GetSpellClass(SpellSlot.R).Level], 240, 0.6F, 900000, false);
+                            var pred = Prediction.MenuSelected.GetPrediction(Prediction.MenuSelected.PredictionType.Circle, enemie.Target, RRange[UnitManager.MyChampion.GetSpellBook().GetSpellClass(SpellSlot.R).Level], 240, 0, 600, false);
                             if (pred.HitChance == Prediction.MenuSelected.HitChance.High || pred.HitChance == Prediction.MenuSelected.HitChance.VeryHigh || pred.HitChance == Prediction.MenuSelected.HitChance.Immobile)
                             {
                                 SpellCastProvider.CastSpell(CastSlot.R, pred.CastPosition, 0.25F);
                             }
-                            /*var pred = Prediction.LS.GetPrediction(enemie.Target, 0.6F, 240, 10000);
-                            if (pred.Hitchance == VeryHigh || pred.Hitchance == High || pred.Hitchance == Immobile && UnitManager.MyChampion.GetSpellBook().GetSpellClass(SpellSlot.R).IsSpellReady)
-                            {
-                                SpellCastProvider.CastSpell(CastSlot.R, pred.CastPosition, 0.25F);
-                            }*/
                             Orbwalker.AllowAttacking = true;
                         }
-                        if (enemie.IsKillableAA && enemie.Target.IsInRange(UnitManager.MyChampion.TrueAttackRange) && MenuManager.GetTab("OKMaw - Settings").GetItem<Switch>(KillStealerAA).IsOn)
+                        
+                        if ((Tick - LastAATick) >= 800)
                         {
-                            Orbwalker.SelectedTarget = enemie.Target;
-                            Orbwalker.SelectedHero = enemie.Target;
+                            if (enemie.IsKillableAA && enemie.Target.IsInRange(UnitManager.MyChampion.TrueAttackRange) && MenuManager.GetTab("OKMaw - Settings").GetItem<Switch>(KillStealerAA).IsOn)
+                            {
+                                if (Orbwalker.CanBasicAttack)
+                                {
+                                    var MPos = Mouse._restore;
+                                    //Oasys.SDK.Tools.Logger.Log($"{MPos.X}, {MPos.Y}");
+                                    MouseProvider.SetCursor(enemie.Target.Position.ToW2S());
+                                    //Oasys.SDK.Tools.Logger.Log($"{MPos.X}, {MPos.Y}");
+                                    Mouse.LeftClick();
+                                    LastAATick = Tick;
+                                }
+                            }
                         }
                         if (enemie.IsKillableQ && MenuManager.GetTab("OKMaw - Settings").GetItem<Switch>(KillStealerQ).IsOn && UnitManager.MyChampion.GetSpellBook().GetSpellClass(SpellSlot.Q).IsSpellReady)
                         {

@@ -154,6 +154,9 @@ namespace Ok_Maw.Modules.Spells
     {
         internal float[] PercentPerXAP = new float[2] { 1, 100 };
         internal float[] WMaxHealthPerLevel = new float[6] { 0, 3, 4, 5, 6, 7 };
+        internal float BaseRange = 500;
+        internal float[] WBonusRange = new float[6] { 0, 130, 150, 170, 190, 210 };
+        internal float CurrentRange => CalculateAARangeWithW();
 
         internal KogMaw()
         {
@@ -186,6 +189,10 @@ namespace Ok_Maw.Modules.Spells
             AppliesDebuff = true;
             Setlevel<KogMaw>();
         }
+
+        private float WRange() => WBonusRange[WLevel];
+
+        private float CalculateAARangeWithW() => WRange() + BaseRange;
 
         internal float CalculateActualDamage(GameObjectBase target, SpellSlot spell)
         {
@@ -224,28 +231,28 @@ namespace Ok_Maw.Modules.Spells
                     RawDamage += CalculateActualWDamagePerAA(target);
                 }
             }
-            Logger.Log(RawDamage);
+            //Oasys.SDK.Tools.Logger.Log($"{RawDamage}");
             return RawDamage;
         }
 
         internal float CalculateActualQDamage(GameObjectBase target)
         {
             float RawAPDamage = QBaseDamagePerLevel[QLevel] + (ChampionClient.UnitStats.TotalAbilityPower * (QAPScalingPerLevel[QLevel] / 100));
-            Logger.Log($"Q Damage - {target.ModelName}:" + DamageCalculator.CalculateActualDamage(ChampionClient, target, 0, RawAPDamage, 0) + $" Raw Damage: {RawAPDamage}");
+            //Oasys.SDK.Tools.Logger.Log($"Q Damage - {target.ModelName}:" + DamageCalculator.CalculateActualDamage(ChampionClient, target, 0, RawAPDamage, 0) + $" Raw Damage: {RawAPDamage}");
             return DamageCalculator.CalculateActualDamage(ChampionClient, target, 0, RawAPDamage, 0);
         }
 
         internal float CalculateActualWDamagePerAA(GameObjectBase target)
         {
             float RawAPDamage = (target.MaxHealth * ((WMaxHealthPerLevel[WLevel] + ((float)decimal.Round((decimal)(ChampionClient.UnitStats.TotalAbilityPower / 100), 0))) / 100));
-            Logger.Log("W/AA Damage:" + DamageCalculator.CalculateActualDamage(ChampionClient, target, 0, RawAPDamage, 0) + $" Raw Damage: {RawAPDamage}");
+            //Oasys.SDK.Tools.Logger.Log("W/AA Damage:" + DamageCalculator.CalculateActualDamage(ChampionClient, target, 0, RawAPDamage, 0) + $" Raw Damage: {RawAPDamage}");
             return DamageCalculator.CalculateActualDamage(ChampionClient, target, 0, RawAPDamage, 0);
         }
 
         internal float CalculateActualEDamage(GameObjectBase target)
         {
             float RawAPDamage = EBaseDamagePerLevel[ELevel] + (ChampionClient.UnitStats.TotalAbilityPower * (EAPScalingPerLevel[ELevel] / 100));
-            Logger.Log("E Damage:" + DamageCalculator.CalculateActualDamage(ChampionClient, target, 0, RawAPDamage, 0) + $" Raw Damage: {RawAPDamage}");
+            //Oasys.SDK.Tools.Logger.Log("E Damage:" + DamageCalculator.CalculateActualDamage(ChampionClient, target, 0, RawAPDamage, 0) + $" Raw Damage: {RawAPDamage}");
             return DamageCalculator.CalculateActualDamage(ChampionClient, target, 0, RawAPDamage, 0);
         }
 
@@ -260,7 +267,7 @@ namespace Ok_Maw.Modules.Spells
             else {
                 RawPlusMissHealth = RawAPDamage + (MissingHealthInPercent * 0.83333333333333333333333333333F);
             }
-            Logger.Log("R Damage:" + DamageCalculator.CalculateActualDamage(ChampionClient, target, 0, RawPlusMissHealth, 0) + $" Raw Damage: {RawAPDamage} : MissHealth {RawPlusMissHealth}");
+            //Oasys.SDK.Tools.Logger.Log("R Damage:" + DamageCalculator.CalculateActualDamage(ChampionClient, target, 0, RawPlusMissHealth, 0) + $" Raw Damage: {RawAPDamage} + MissHealth {RawPlusMissHealth}");
             return DamageCalculator.CalculateActualDamage(ChampionClient, target, 0, RawPlusMissHealth, 0);
         }
     }

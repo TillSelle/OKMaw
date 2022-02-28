@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using Ok_Maw.Modules;
 using Oasys.Common.Enums.GameEnums;
 using Oasys.SDK.Rendering;
-using Oasys.SDK.Tools;
 using Oasys.SDK.Menu;
 using Oasys.Common.Menu.ItemComponents;
 using Oasys.SDK.Events;
@@ -29,17 +28,41 @@ namespace Ok_Maw
         internal bool IsKillable => (IsKillableQ == true)? true : (IsKillableW == true)? true : (IsKillableE == true)? true : (IsKillableR == true)? true : (IsKillableAA == true)? true : false;
     }
 
-    internal class _CoreEvents
+    internal static partial class _CoreEvents
     {
         internal static List<Hero> enemies => UnitManager.EnemyChampions;
         internal static List<CanKillClass> IsKillable = new();
+        internal static bool KSIsOn;
+        internal static bool ACIsOn;
         internal static int Ticks = 0;
         internal static int LastTick = 0;
         internal static Task MainTick()
         {
             Ticks += 10;
-            if (!MenuManager.GetTab("OKMaw - Settings").GetItem<Switch>(Modules.KillSteal.KillStealer).IsOn)
-                CoreEvents.OnCoreMainTick -= KillSteal.KillstealerAndAutoCast;
+
+            if (MenuManager.GetTab("OKMaw - Settings").ModeSelected(KillSteal.KillStealMode, "InCombo")) {
+                CoreEvents.OnCoreMainTick -= KillSteal.Killstealer;
+                KSIsOn = false;
+            }
+
+            if (MenuManager.GetTab("OKMaw - Settings").ModeSelected(Autocast.AutoCasterMode, "InCombo")) {
+                CoreEvents.OnCoreMainTick -= Autocast.Autocaster;
+                ACIsOn = false;
+            }
+
+            // Checks if the KillStealer is activated in the tab and on
+            if (!MenuManager.GetTab("OKMaw - Settings").SwitchItemOn(Modules.KillSteal.KillStealer) && KSIsOn) 
+            {
+                CoreEvents.OnCoreMainTick -= KillSteal.Killstealer;
+                KSIsOn = false;
+            }
+
+            // Checks if the AutoCaster is activated in the tab and on
+            if (!MenuManager.GetTab("OkMaw - Settings").SwitchItemOn(Modules.Autocast.AutoCaster) && ACIsOn)
+            {
+                CoreEvents.OnCoreMainTick -= Autocast.Autocaster;
+                ACIsOn = false;
+            }
             if (Ticks - LastTick >= 100)
             {
                 IsKillable.Clear();
@@ -54,27 +77,27 @@ namespace Ok_Maw
                     if (champ.IsKillable(SpellSlot.Q))
                     {
                         isKillableQ = true;
-                        Logger.Log($"Q: {isKillableQ}");
+                        //Oasys.SDK.Tools.Logger.Log($"Q: {isKillableQ}");
                     }
                     if (champ.IsKillable(SpellSlot.W))
                     {
                         isKillableW = true;
-                        Logger.Log($"W: {isKillableW}");
+                        //Oasys.SDK.Tools.Logger.Log($"W: {isKillableW}");
                     }
                     if (champ.IsKillable(SpellSlot.E))
                     {
                         isKillableE = true;
-                        Logger.Log($"E: {isKillableE}");
+                        //Oasys.SDK.Tools.Logger.Log($"E: {isKillableE}");
                     }
                     if (champ.IsKillable(SpellSlot.R))
                     {
                         isKillableR = true;
-                        Logger.Log($"R: {isKillableR}");
+                        //Oasys.SDK.Tools.Logger.Log($"R: {isKillableR}");
                     }
                     if (champ.IsKillable(SpellSlot.BasicAttack))
                     {
                         isKillableAA = true;
-                        Logger.Log($"AA: {isKillableAA}");
+                        //Oasys.SDK.Tools.Logger.Log($"AA: {isKillableAA}");
                     }
                     IsKillable.Add(new()
                     {
@@ -88,9 +111,21 @@ namespace Ok_Maw
                     });
 
                 }
-                if (MenuManager.GetTab("OKMaw - Settings").GetItem<Switch>(Modules.KillSteal.KillStealer).IsOn)
+                if (MenuManager.GetTab("OKMaw - Settings").GetItem<Switch>(KillSteal.KillStealer).IsOn && !KSIsOn)
                 {
-                    CoreEvents.OnCoreMainTick += KillSteal.KillstealerAndAutoCast;
+                    if (MenuManager.GetTab("OKMaw - Settings").ModeSelected(KillSteal.KillStealMode, "InRange"))
+                    {
+                        CoreEvents.OnCoreMainTick += KillSteal.Killstealer;
+                        KSIsOn = true;
+                    }
+                }
+                if (MenuManager.GetTab("OKMaw - Settings").SwitchItemOn(Autocast.AutoCaster) && !ACIsOn)
+                {
+                    if (MenuManager.GetTab("OKMaw - Settings").ModeSelected(Autocast.AutoCasterMode, "InRange"))
+                    {
+                        CoreEvents.OnCoreMainTick += Autocast.Autocaster;
+                        ACIsOn = true;
+                    }
                 }
             }
             return Task.FromResult(0);
