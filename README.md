@@ -6,7 +6,7 @@
 * * Still kinda buggy always gets lower results than the actual damage...
 * Killsteal with Q,E,R and AA
 * Calculation of IsKillable (dependable since Calc result is lower damage than it actually does)
-* Console Debugging (non-optional)
+* (Not visible) Console Debugging (non-optional)
 * Autocast for all Spells
 * * Not yet working Modes
 * Working Menu with bugs (Debug Tab not working)
