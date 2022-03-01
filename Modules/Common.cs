@@ -13,10 +13,21 @@ namespace Ok_Maw
     {
         public static AIHeroClient Me => UnitManager.MyChampion;
 
+        /// <summary>
+        /// Checks if any enemy champ is in range
+        /// </summary>
+        /// <param name="spellslot"></param>
+        /// <returns><see cref="bool">Boolean</see></returns>
         public static bool AnyOneInRange(SpellSlot spellslot)
         {
             return AnyOneInRange(Me.CastRange(spellslot));
         }
+
+        /// <summary>
+        /// Checks if any enemy champ is in range
+        /// </summary>
+        /// <param name="spellCastRange"></param>
+        /// <returns><see cref="bool">Boolean</see></returns>
         public static bool AnyOneInRange(float spellCastRange)
         {
             bool someoneInRange = false;

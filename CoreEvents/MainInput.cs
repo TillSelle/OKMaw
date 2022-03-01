@@ -13,8 +13,11 @@ namespace Ok_Maw
 {
     internal static partial class _CoreEvents
     {
+
+        // Main Input function for every time (default)Space is pressed down
         public static async Task MainInput()
         {
+            // Section for the KillStealer
             if (MenuManager.GetTab(KillSteal.BasicKogMawTab).SwitchItemOn(KillSteal.KillStealer))
             {
                 if (MenuManager.GetTab(KillSteal.BasicKogMawTab).GetItem<ModeDisplay>(KillSteal.KillStealMode).SelectedModeName == "InCombo" && !KSIsOn)
@@ -24,6 +27,7 @@ namespace Ok_Maw
                 }
             }
 
+            // Section for the AutoCaster
             if (MenuManager.GetTab(KillSteal.BasicKogMawTab).SwitchItemOn(Autocast.AutoCaster))
             {
                 if (MenuManager.GetTab(KillSteal.BasicKogMawTab).ModeSelected(Autocast.AutoCasterMode, "InCombo") && !ACIsOn)

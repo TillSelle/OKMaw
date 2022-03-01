@@ -36,7 +36,7 @@ namespace Ok_Maw.Modules
             Tab KogSettingsTab = MenuManager.GetTab("OKMaw - Settings");
             // Check if AutoCaster is turned on in the menu
             // If the last action was done <= XXX Ticks ago => Skip
-            if ((Tick - LastActionTick) <= 400)
+            if ((Tick - LastActionTick) <= 50)
                 return Task.CompletedTask;
             KogMaw champ = new KogMaw();
             if (KogSettingsTab.SwitchItemOn(AutoCaster) && Use.Me.IsAlive)
@@ -98,7 +98,7 @@ namespace Ok_Maw.Modules
                 // R Auto cast if turned on (Not recommended)
                 if (KogSettingsTab.SwitchItemOn(AutoCasterR) && Use.Me.SpellReady(SpellSlot.R))
                 {
-                    if (Use.AnyOneInRange(SpellSlot.E))
+                    if (Use.AnyOneInRange(SpellSlot.R))
                     {
                         foreach (AIHeroClient Hero in UnitManager.EnemyChampions)
                         {

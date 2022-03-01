@@ -45,6 +45,7 @@ namespace Ok_Maw.Modules
 
         public static Task Killstealer()
         {
+            
             Tick += 10;
             if (MenuManager.GetTab("OKMaw - Settings").GetItem<Switch>(KillStealer).IsOn)
             {
@@ -57,60 +58,62 @@ namespace Ok_Maw.Modules
                         float[] RRange = new float[4] {0,1300,1550,1800};
                         if (MenuManager.GetTab("OKMaw - Settings").GetItem<Switch>(KillStealerR).IsOn && enemie.IsKillableR && enemie.Target.IsInRange(RRange[UnitManager.MyChampion.GetSpellBook().GetSpellClass(SpellSlot.R).Level]))
                         {
-                            Orbwalker.AllowAttacking = false;
-
-                            var pred = Prediction.MenuSelected.GetPrediction(Prediction.MenuSelected.PredictionType.Circle, enemie.Target, RRange[UnitManager.MyChampion.GetSpellBook().GetSpellClass(SpellSlot.R).Level], 240, 0, 600, false);
-                            if (pred.HitChance == Prediction.MenuSelected.HitChance.High || pred.HitChance == Prediction.MenuSelected.HitChance.VeryHigh || pred.HitChance == Prediction.MenuSelected.HitChance.Immobile)
+                            KogMaw kog = new KogMaw();
+                            if (Use.Me.Mana - 40 >= kog.CurrentManaCost)
                             {
-                                SpellCastProvider.CastSpell(CastSlot.R, pred.CastPosition, 0.25F);
+                                Orbwalker.AllowAttacking = false;
+
+                                var pred = Prediction.MenuSelected.GetPrediction(Prediction.MenuSelected.PredictionType.Circle, enemie.Target, RRange[UnitManager.MyChampion.GetSpellBook().GetSpellClass(SpellSlot.R).Level], 240, 0, 600, false);
+                                if (pred.HitChance == Prediction.MenuSelected.HitChance.High || pred.HitChance == Prediction.MenuSelected.HitChance.VeryHigh || pred.HitChance == Prediction.MenuSelected.HitChance.Immobile)
+                                {
+                                    SpellCastProvider.CastSpell(CastSlot.R, pred.CastPosition, 0.25F);
+                                }
+                                Orbwalker.AllowAttacking = true;
                             }
-                            Orbwalker.AllowAttacking = true;
                         }
                         
                         if ((Tick - LastAATick) >= 800)
                         {
-                            if (enemie.IsKillableAA && enemie.Target.IsInRange(UnitManager.MyChampion.TrueAttackRange) && MenuManager.GetTab("OKMaw - Settings").GetItem<Switch>(KillStealerAA).IsOn)
+                            if (enemie.IsKillableAA || enemie.IsKillableW && enemie.Target.IsInRange(UnitManager.MyChampion.TrueAttackRange) && MenuManager.GetTab("OKMaw - Settings").GetItem<Switch>(KillStealerAA).IsOn)
                             {
                                 if (Orbwalker.CanBasicAttack)
                                 {
-                                    var MPos = Mouse._restore;
+                                    
+                                    var MPos = GameEngine.ScreenMousePosition;
+                                    
                                     //Oasys.SDK.Tools.Logger.Log($"{MPos.X}, {MPos.Y}");
                                     MouseProvider.SetCursor(enemie.Target.Position.ToW2S());
                                     //Oasys.SDK.Tools.Logger.Log($"{MPos.X}, {MPos.Y}");
                                     Mouse.LeftClick();
+                                    MouseProvider.SetCursor(MPos);
+
                                     LastAATick = Tick;
                                 }
                             }
                         }
                         if (enemie.IsKillableQ && MenuManager.GetTab("OKMaw - Settings").GetItem<Switch>(KillStealerQ).IsOn && UnitManager.MyChampion.GetSpellBook().GetSpellClass(SpellSlot.Q).IsSpellReady)
                         {
-                            Orbwalker.AllowAttacking = false;
+                                Orbwalker.AllowAttacking = false;
 
-                            var pred = Prediction.MenuSelected.GetPrediction(Prediction.MenuSelected.PredictionType.Line, enemie.Target, 1360, 240, 0.25F, 1400, true);
-                            if (pred.HitChance == Prediction.MenuSelected.HitChance.High || pred.HitChance == Prediction.MenuSelected.HitChance.VeryHigh || pred.HitChance == Prediction.MenuSelected.HitChance.Immobile && !pred.Collision)
-                            {
-                                SpellCastProvider.CastSpell(CastSlot.Q, pred.CastPosition, 0.25F);
-                            }
+                                var pred = Prediction.MenuSelected.GetPrediction(Prediction.MenuSelected.PredictionType.Line, enemie.Target, 1360, 240, 0.25F, 1400, true);
+                                if (pred.HitChance == Prediction.MenuSelected.HitChance.High || pred.HitChance == Prediction.MenuSelected.HitChance.VeryHigh || pred.HitChance == Prediction.MenuSelected.HitChance.Immobile && !pred.Collision)
+                                {
+                                    SpellCastProvider.CastSpell(CastSlot.Q, pred.CastPosition, 0.25F);
+                                }
 
-                            Orbwalker.AllowAttacking = true;
+                                Orbwalker.AllowAttacking = true;
                         }
                         if (enemie.IsKillableE && enemie.Target.IsInRange(1360) && MenuManager.GetTab("OKMaw - Settings").GetItem<Switch>(KillStealerE).IsOn)
                         {
-                            Orbwalker.AllowAttacking = false;
+                                Orbwalker.AllowAttacking = false;
 
-                            var pred = Prediction.MenuSelected.GetPrediction(Prediction.MenuSelected.PredictionType.Line, enemie.Target, 1360, 240, 0.25F, 1400, false);
-                            if (pred.HitChance == Prediction.MenuSelected.HitChance.High || pred.HitChance == Prediction.MenuSelected.HitChance.VeryHigh || pred.HitChance == Prediction.MenuSelected.HitChance.Immobile)
-                            {
-                                SpellCastProvider.CastSpell(CastSlot.E, pred.CastPosition, 0.25F);
+                                var pred = Prediction.MenuSelected.GetPrediction(Prediction.MenuSelected.PredictionType.Line, enemie.Target, 1360, 240, 0.25F, 1400, false);
+                                if (pred.HitChance == Prediction.MenuSelected.HitChance.High || pred.HitChance == Prediction.MenuSelected.HitChance.VeryHigh || pred.HitChance == Prediction.MenuSelected.HitChance.Immobile)
+                                {
+                                    SpellCastProvider.CastSpell(CastSlot.E, pred.CastPosition, 0.25F);
+                                }
+                                Orbwalker.AllowAttacking = true;
                             }
-
-                            /*var pred = Prediction.LS.GetPrediction(enemie.Target, 0.25F, 240, 1400);
-                            if (pred.Hitchance == VeryHigh || pred.Hitchance == High || pred.Hitchance == Immobile && UnitManager.MyChampion.GetSpellBook().GetSpellClass(SpellSlot.E).IsSpellReady)
-                            {
-                                SpellCastProvider.CastSpell(CastSlot.E, enemie.Target.Position, 0.25F);
-                            }*/
-                            Orbwalker.AllowAttacking = true;
-                        }
                     }
                 }
             }

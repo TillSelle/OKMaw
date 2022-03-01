@@ -157,10 +157,10 @@ namespace Ok_Maw.Modules.Spells
         internal float BaseRange = 500;
         internal float[] WBonusRange = new float[6] { 0, 130, 150, 170, 190, 210 };
         internal float CurrentRange => CalculateAARangeWithW();
-
+        internal float[] RManaCostPerCast = new float[10] { 40, 80, 120, 160, 200, 240, 280, 320, 360, 400 };
+        internal float CurrentManaCost => NextCastManaCost(); 
         internal KogMaw()
         {
-            // Set Model Name
             ModelName = "KogMaw";
 
             // Q
@@ -190,6 +190,21 @@ namespace Ok_Maw.Modules.Spells
             Setlevel<KogMaw>();
         }
 
+        private float NextCastManaCost()
+        {
+            float ManaCost = 40;
+            // [8:27:56 pm - OasysDebuger]: Buff Name: kogmawlivingartillerycostBuff Count: Int0 Float1,5E-44 Alt4Buff Times: - Buff Duration: 8/8000ms - Buff Start Time: 1985,53 - Buff End Time: 1993,53Buff Stacks: 4Buff IsActive: True
+            if (Use.Me.BuffManager.HasBuff("kogmawlivingartillerycost"))
+            {
+                var Buff = Use.Me.BuffManager.GetBuffByName("kogmawlivingartillerycost");
+                if (Buff.IsActive)
+                {
+                    ManaCost += 40 * Buff.Stacks;
+                }
+            }
+            return ManaCost;
+        }
+
         private float WRange() => WBonusRange[WLevel];
 
         private float CalculateAARangeWithW() => WRange() + BaseRange;
@@ -208,21 +223,6 @@ namespace Ok_Maw.Modules.Spells
 
         internal float CalculateFullAA(GameObjectBase target, CalculationType type=CalculationType.Min)
         {
-            /*
-            if (type == CalculationType.Min)
-            {
-                
-            }
-            else if (type == CalculationType.Max) {
-
-            } else if (type == CalculationType.None)
-            {
-
-            } else if (type == CalculationType.WithCrit)
-            {
-
-            }
-            */
             float RawDamage = DamageCalculator.GetNextBasicAttackDamage(ChampionClient, target);
             if (ChampionClient.BuffManager.HasBuff("KogMawBioArcaneBarrageBuff"))
             {
@@ -231,28 +231,24 @@ namespace Ok_Maw.Modules.Spells
                     RawDamage += CalculateActualWDamagePerAA(target);
                 }
             }
-            //Oasys.SDK.Tools.Logger.Log($"{RawDamage}");
             return RawDamage;
         }
 
         internal float CalculateActualQDamage(GameObjectBase target)
         {
             float RawAPDamage = QBaseDamagePerLevel[QLevel] + (ChampionClient.UnitStats.TotalAbilityPower * (QAPScalingPerLevel[QLevel] / 100));
-            //Oasys.SDK.Tools.Logger.Log($"Q Damage - {target.ModelName}:" + DamageCalculator.CalculateActualDamage(ChampionClient, target, 0, RawAPDamage, 0) + $" Raw Damage: {RawAPDamage}");
             return DamageCalculator.CalculateActualDamage(ChampionClient, target, 0, RawAPDamage, 0);
         }
 
         internal float CalculateActualWDamagePerAA(GameObjectBase target)
         {
             float RawAPDamage = (target.MaxHealth * ((WMaxHealthPerLevel[WLevel] + ((float)decimal.Round((decimal)(ChampionClient.UnitStats.TotalAbilityPower / 100), 0))) / 100));
-            //Oasys.SDK.Tools.Logger.Log("W/AA Damage:" + DamageCalculator.CalculateActualDamage(ChampionClient, target, 0, RawAPDamage, 0) + $" Raw Damage: {RawAPDamage}");
             return DamageCalculator.CalculateActualDamage(ChampionClient, target, 0, RawAPDamage, 0);
         }
 
         internal float CalculateActualEDamage(GameObjectBase target)
         {
             float RawAPDamage = EBaseDamagePerLevel[ELevel] + (ChampionClient.UnitStats.TotalAbilityPower * (EAPScalingPerLevel[ELevel] / 100));
-            //Oasys.SDK.Tools.Logger.Log("E Damage:" + DamageCalculator.CalculateActualDamage(ChampionClient, target, 0, RawAPDamage, 0) + $" Raw Damage: {RawAPDamage}");
             return DamageCalculator.CalculateActualDamage(ChampionClient, target, 0, RawAPDamage, 0);
         }
 
@@ -261,13 +257,7 @@ namespace Ok_Maw.Modules.Spells
             float RawAPDamage = RBaseDamagePerLevel[RLevel] + (ChampionClient.UnitStats.BonusAttackDamage * (RBonusADScalingPerLevel[RLevel] / 100)) + (ChampionClient.UnitStats.TotalAbilityPower * (RAPScalingPerLevel[RLevel] / 100));
             float MissingHealth = target.MaxHealth - target.Health;
             float MissingHealthInPercent = (MissingHealth / target.MaxHealth) * 100;
-            float RawPlusMissHealth = 0;
-            if (MissingHealthInPercent >= 60)
-                RawPlusMissHealth = RawAPDamage * 2;
-            else {
-                RawPlusMissHealth = RawAPDamage + (MissingHealthInPercent * 0.83333333333333333333333333333F);
-            }
-            //Oasys.SDK.Tools.Logger.Log("R Damage:" + DamageCalculator.CalculateActualDamage(ChampionClient, target, 0, RawPlusMissHealth, 0) + $" Raw Damage: {RawAPDamage} + MissHealth {RawPlusMissHealth}");
+            float RawPlusMissHealth = (MissingHealthInPercent >= 60) ? RawAPDamage * 2 : RawAPDamage + (MissingHealthInPercent * 0.83333333333333333333333333333F);
             return DamageCalculator.CalculateActualDamage(ChampionClient, target, 0, RawPlusMissHealth, 0);
         }
     }

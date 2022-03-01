@@ -34,6 +34,11 @@ namespace Ok_Maw
             return !target.IsTargetable;
         }
 
+        public static bool ManaLimit(this AIHeroClient champ, float Mana)
+        {
+            return champ.Mana <= Mana;
+        }
+
         public static SpellBook MyBook()
         {
             return Use.Me.GetSpellBook();

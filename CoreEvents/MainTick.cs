@@ -25,6 +25,7 @@ namespace Ok_Maw
         internal bool IsKillableE { get; set; }
         internal bool IsKillableR { get; set; }
         internal bool IsKillableAA { get; set; }
+        // Checks if the enemy is in any way Killable. (Condition)? (whatever should happen when true) : (whatever should happen when false)
         internal bool IsKillable => (IsKillableQ == true)? true : (IsKillableW == true)? true : (IsKillableE == true)? true : (IsKillableR == true)? true : (IsKillableAA == true)? true : false;
     }
 
@@ -36,19 +37,10 @@ namespace Ok_Maw
         internal static bool ACIsOn;
         internal static int Ticks = 0;
         internal static int LastTick = 0;
+
         internal static Task MainTick()
         {
             Ticks += 10;
-
-            if (MenuManager.GetTab("OKMaw - Settings").ModeSelected(KillSteal.KillStealMode, "InCombo")) {
-                CoreEvents.OnCoreMainTick -= KillSteal.Killstealer;
-                KSIsOn = false;
-            }
-
-            if (MenuManager.GetTab("OKMaw - Settings").ModeSelected(Autocast.AutoCasterMode, "InCombo")) {
-                CoreEvents.OnCoreMainTick -= Autocast.Autocaster;
-                ACIsOn = false;
-            }
 
             // Checks if the KillStealer is activated in the tab and on
             if (!MenuManager.GetTab("OKMaw - Settings").SwitchItemOn(Modules.KillSteal.KillStealer) && KSIsOn) 
@@ -63,12 +55,18 @@ namespace Ok_Maw
                 CoreEvents.OnCoreMainTick -= Autocast.Autocaster;
                 ACIsOn = false;
             }
+
+            // Should not run every Tick since this could impact the performance too much so we take the LastTick var that gets updated every 10th tick with the current Tick var so we can check if it has executed 10 ticks already
             if (Ticks - LastTick >= 100)
             {
-                IsKillable.Clear();
+                // "Clear" the list so in the foreach inside of Killstealer() we don't loop through the same char twice (I assign a new one so in the case that this var is accessed at "the same time" in Killstealer and MainTick the lists values inside of Killstealer aren't getting overwritten/deleted)
+                IsKillable = new();
+
                 LastTick = Ticks;
+                
                 foreach (Hero champ in enemies)
                 {
+                    // IsKillAble Check the rest should be self explanatory 
                     bool isKillableQ = false;
                     bool isKillableW = false;
                     bool isKillableE = false;
@@ -77,27 +75,22 @@ namespace Ok_Maw
                     if (champ.IsKillable(SpellSlot.Q))
                     {
                         isKillableQ = true;
-                        //Oasys.SDK.Tools.Logger.Log($"Q: {isKillableQ}");
                     }
                     if (champ.IsKillable(SpellSlot.W))
                     {
                         isKillableW = true;
-                        //Oasys.SDK.Tools.Logger.Log($"W: {isKillableW}");
                     }
                     if (champ.IsKillable(SpellSlot.E))
                     {
                         isKillableE = true;
-                        //Oasys.SDK.Tools.Logger.Log($"E: {isKillableE}");
                     }
                     if (champ.IsKillable(SpellSlot.R))
                     {
                         isKillableR = true;
-                        //Oasys.SDK.Tools.Logger.Log($"R: {isKillableR}");
                     }
                     if (champ.IsKillable(SpellSlot.BasicAttack))
                     {
                         isKillableAA = true;
-                        //Oasys.SDK.Tools.Logger.Log($"AA: {isKillableAA}");
                     }
                     IsKillable.Add(new()
                     {
@@ -111,16 +104,22 @@ namespace Ok_Maw
                     });
 
                 }
+
+                // Add killstealer as OnCoreMainTick subscriber when the killstealer isnt on and its turned on inside of the menu
                 if (MenuManager.GetTab("OKMaw - Settings").GetItem<Switch>(KillSteal.KillStealer).IsOn && !KSIsOn)
                 {
+                    // Check if the Killstealer is actually set to "InRange"
                     if (MenuManager.GetTab("OKMaw - Settings").ModeSelected(KillSteal.KillStealMode, "InRange"))
                     {
                         CoreEvents.OnCoreMainTick += KillSteal.Killstealer;
                         KSIsOn = true;
                     }
                 }
+
+                // Add Autocaster as OnCoreMainTick subscriber when the autocaster isnt on and its turned on inside of the menu
                 if (MenuManager.GetTab("OKMaw - Settings").SwitchItemOn(Autocast.AutoCaster) && !ACIsOn)
                 {
+                    // Check if the Autocaster is actually set to "InRange"
                     if (MenuManager.GetTab("OKMaw - Settings").ModeSelected(Autocast.AutoCasterMode, "InRange"))
                     {
                         CoreEvents.OnCoreMainTick += Autocast.Autocaster;

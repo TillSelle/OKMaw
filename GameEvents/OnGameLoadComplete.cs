@@ -50,16 +50,17 @@ namespace Ok_Maw
                 KillSteal.KillStealerE = KillStealerE;
                 KillSteal.KillStealerR = KillStealerR;
                 KillSteal.KillStealMode = KillStealerMode;
+
                 Autocast.AutoCaster = AutoCaster;
                 Autocast.AutoCasterE = AutoCasterE;
                 Autocast.AutoCasterQ = AutoCasterQ;
                 Autocast.AutoCasterR = AutoCasterR;
                 Autocast.AutoCasterW = AutoCasterW;
                 Autocast.AutoCasterMode = AutoCasterMode;
+
                 CoreEvents.OnCoreMainTick += _CoreEvents.MainTick;
                 CoreEvents.OnCoreMainInputAsync += _CoreEvents.MainInput;
                 CoreEvents.OnCoreMainInputRelease += _CoreEvents.MainInputRelease;
-                //Oasys.SDK.Tools.Logger.Log("You are playing KogMaw!");
             }
             return Task.FromResult(0);
         }
