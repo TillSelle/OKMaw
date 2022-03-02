@@ -4,16 +4,10 @@ using Oasys.Common.Menu.ItemComponents;
 using Oasys.SDK;
 using Oasys.SDK.Menu;
 using Ok_Maw.Modules.Spells;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Oasys.Common.Extensions;
 using Oasys.SDK.SpellCasting;
 using Oasys.Common.Tools.Devices;
 using Oasys.SDK.InputProviders;
-using Oasys.Common.GameObject;
 using static Oasys.Common.Logic.LS.HitChance;
 
 namespace Ok_Maw.Modules
@@ -25,6 +19,7 @@ namespace Ok_Maw.Modules
 
         public static int BasicKogMawTab;
         public static int KillStealer;
+        public static int KillStealDrawings;
         public static int KillStealerQ;
         public static int KillStealerE;
         public static int KillStealerR;
@@ -59,7 +54,7 @@ namespace Ok_Maw.Modules
                         if (MenuManager.GetTab("OKMaw - Settings").GetItem<Switch>(KillStealerR).IsOn && enemie.IsKillableR && enemie.Target.IsInRange(RRange[UnitManager.MyChampion.GetSpellBook().GetSpellClass(SpellSlot.R).Level]))
                         {
                             KogMaw kog = new KogMaw();
-                            if (Use.Me.Mana - 40 >= kog.CurrentManaCost)
+                            if (Use.Me.Mana - 40 >= kog.CurrentManaCost && enemie.Target.IsVisible && enemie.Target.Position.IsOnScreen())
                             {
                                 Orbwalker.AllowAttacking = false;
 
@@ -76,7 +71,7 @@ namespace Ok_Maw.Modules
                         {
                             if (enemie.IsKillableAA || enemie.IsKillableW && enemie.Target.IsInRange(UnitManager.MyChampion.TrueAttackRange) && MenuManager.GetTab("OKMaw - Settings").GetItem<Switch>(KillStealerAA).IsOn)
                             {
-                                if (Orbwalker.CanBasicAttack)
+                                if (Orbwalker.CanBasicAttack && enemie.Target.IsVisible && enemie.Target.Position.IsOnScreen())
                                 {
                                     
                                     var MPos = GameEngine.ScreenMousePosition;
@@ -93,6 +88,8 @@ namespace Ok_Maw.Modules
                         }
                         if (enemie.IsKillableQ && MenuManager.GetTab("OKMaw - Settings").GetItem<Switch>(KillStealerQ).IsOn && UnitManager.MyChampion.GetSpellBook().GetSpellClass(SpellSlot.Q).IsSpellReady)
                         {
+                            if (Use.Me.ManaLimit(160) && enemie.Target.IsVisible && enemie.Target.Position.IsOnScreen())
+                            {
                                 Orbwalker.AllowAttacking = false;
 
                                 var pred = Prediction.MenuSelected.GetPrediction(Prediction.MenuSelected.PredictionType.Line, enemie.Target, 1360, 240, 0.25F, 1400, true);
@@ -102,9 +99,12 @@ namespace Ok_Maw.Modules
                                 }
 
                                 Orbwalker.AllowAttacking = true;
+                            }
                         }
                         if (enemie.IsKillableE && enemie.Target.IsInRange(1360) && MenuManager.GetTab("OKMaw - Settings").GetItem<Switch>(KillStealerE).IsOn)
                         {
+                            if (Use.Me.ManaLimit(200) && enemie.Target.IsVisible && enemie.Target.Position.IsOnScreen())
+                            {
                                 Orbwalker.AllowAttacking = false;
 
                                 var pred = Prediction.MenuSelected.GetPrediction(Prediction.MenuSelected.PredictionType.Line, enemie.Target, 1360, 240, 0.25F, 1400, false);
@@ -114,6 +114,7 @@ namespace Ok_Maw.Modules
                                 }
                                 Orbwalker.AllowAttacking = true;
                             }
+                        }
                     }
                 }
             }

@@ -36,7 +36,7 @@ namespace Ok_Maw
 
         public static bool ManaLimit(this AIHeroClient champ, float Mana)
         {
-            return champ.Mana <= Mana;
+            return champ.Mana >= Mana;
         }
 
         public static SpellBook MyBook()

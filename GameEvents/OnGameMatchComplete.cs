@@ -1,6 +1,5 @@
 ﻿using Oasys.SDK;
 using Oasys.SDK.Events;
-using Oasys.SDK.Tools;
 
 
 namespace Ok_Maw
@@ -12,6 +11,9 @@ namespace Ok_Maw
             if (UnitManager.MyChampion.ModelName == "KogMaw")
             {
                 CoreEvents.OnCoreMainTick -= _CoreEvents.MainTick;
+                CoreEvents.OnCoreMainInputAsync -= _CoreEvents.MainInput;
+                CoreEvents.OnCoreMainInputRelease -= _CoreEvents.MainInputRelease;
+                CoreEvents.OnCoreRender -= _CoreEvents.OnCoreRender;
             }
             return Task.FromResult(0);
         }

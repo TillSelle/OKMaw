@@ -3,7 +3,6 @@ using Oasys.SDK.Events;
 using Ok_Maw.Modules;
 using Oasys.SDK.Menu;
 using Oasys.Common.Menu.ItemComponents;
-using Oasys.Common.Menu;
 
 namespace Ok_Maw
 {
@@ -26,6 +25,7 @@ namespace Ok_Maw
                 // Adding Tabs for basic Module Usage
                 var tabindex = MenuManager.AddTab(new() { Title = "OKMaw - Settings" });
                 var KillStealer = MenuManager.GetTab(tabindex).AddItem(new Switch() { IsOn = true, TabName = "OKMaw - Settings", Title = "KillStealer" });
+                var KillStealDrawings = MenuManager.GetTab(tabindex).AddItem(new Switch() { IsOn = true, TabName = "OKMaw - Settings", Title = "KillStealer Drawings" });
                 var KillStealerQ = MenuManager.GetTab(tabindex).AddItem(new Switch() { IsOn = false, TabName = "OKMaw - Settings", Title = "Kill steal with Q" });
                 var KillStealerE = MenuManager.GetTab(tabindex).AddItem(new Switch() { IsOn = false, TabName = "OKMaw - Settings", Title = "Kill steal with E" });
                 var KillStealerR = MenuManager.GetTab(tabindex).AddItem(new Switch() { IsOn = false, TabName = "OKMaw - Settings", Title = "Kill steal with R" });
@@ -43,6 +43,7 @@ namespace Ok_Maw
                 LoggerTabs.DebuggerTab = DebugTab;
                 LoggerTabs.DebugItemIndex = DebugItemIndex;
 
+                KillSteal.KillStealDrawings = KillStealDrawings;
                 KillSteal.BasicKogMawTab = tabindex;
                 KillSteal.KillStealer = KillStealer;
                 KillSteal.KillStealerQ = KillStealerQ;
@@ -61,6 +62,7 @@ namespace Ok_Maw
                 CoreEvents.OnCoreMainTick += _CoreEvents.MainTick;
                 CoreEvents.OnCoreMainInputAsync += _CoreEvents.MainInput;
                 CoreEvents.OnCoreMainInputRelease += _CoreEvents.MainInputRelease;
+                CoreEvents.OnCoreRender += _CoreEvents.OnCoreRender;
             }
             return Task.FromResult(0);
         }
