@@ -1,4 +1,9 @@
 # OKMaw
+
+<p align="center">
+  <img src="https://github.com/TillSelle/OKMaw/blob/main/previewRKS.gif" alt="R Killsteal Preview"/>
+</p>
+
 ## What is currently implemented?
 * Menu Tab with switchable modes and toggle on/off
 * * Working for Killstealer
